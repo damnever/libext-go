@@ -1,4 +1,4 @@
-module github.com/damnever/pkg-go
+module github.com/damnever/libext-go
 
 go 1.13
 
