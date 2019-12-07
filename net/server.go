@@ -77,10 +77,10 @@ func NewUDPServer(laddr string, handleConn PacketHandleFunc) (*PacketServer, err
 	if err != nil {
 		return nil, err
 	}
-	return NewUDPServerFromConn(conn, handleConn), nil
+	return NewPacketServerFromConn(conn, handleConn), nil
 }
 
-func NewUDPServerFromConn(conn net.PacketConn, handleConn PacketHandleFunc) *PacketServer {
+func NewPacketServerFromConn(conn net.PacketConn, handleConn PacketHandleFunc) *PacketServer {
 	var buf [2048]byte
 	return &PacketServer{
 		GenericServer: NewGenericServer(func(ctx context.Context) (func(), error) {
