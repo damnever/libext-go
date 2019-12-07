@@ -16,11 +16,92 @@ var (
 )
 
 const (
-	defaultGracefulTimeout = time.Second
+	defaultGracefulTimeout = 100 * time.Millisecond
 )
 
-type ConnHandler interface {
-	HandleConn(context.Context, net.Conn) error // It may need to recover the panic.
+type (
+	ConnHandleFunc func(context.Context, net.Conn)
+
+	Server struct {
+		*GenericServer
+
+		listener net.Listener
+	}
+)
+
+func NewTCPServer(laddr string, handleConn ConnHandleFunc) (*Server, error) {
+	l, err := net.Listen("tcp", laddr)
+	if err != nil {
+		return nil, err
+	}
+	return NewServerFromListener(l, handleConn), nil
+}
+
+func NewUnixServer(sockpath string, handleConn ConnHandleFunc) (*Server, error) {
+	l, err := net.Listen("unix", sockpath)
+	if err != nil {
+		return nil, err
+	}
+	return NewServerFromListener(l, handleConn), nil
+}
+
+func NewServerFromListener(l net.Listener, handleConn ConnHandleFunc) *Server {
+	return &Server{
+		GenericServer: NewGenericServer(func(ctx context.Context) (func(), error) {
+			conn, err := l.Accept()
+			if err != nil {
+				return nil, err
+			}
+			return func() { handleConn(ctx, conn) }, nil
+		}, l.Close),
+		listener: l,
+	}
+}
+
+func (s *Server) ListenAddr() net.Addr {
+	return s.listener.Addr()
+}
+
+type (
+	PacketHandleFunc func(context.Context, net.PacketConn, net.Addr, []byte)
+
+	PacketServer struct {
+		*GenericServer
+
+		conn net.PacketConn
+	}
+)
+
+func NewUDPServer(laddr string, handleConn PacketHandleFunc) (*PacketServer, error) {
+	conn, err := net.ListenPacket("udp", laddr)
+	if err != nil {
+		return nil, err
+	}
+	return NewUDPServerFromConn(conn, handleConn), nil
+}
+
+func NewUDPServerFromConn(conn net.PacketConn, handleConn PacketHandleFunc) *PacketServer {
+	var buf [2048]byte
+	return &PacketServer{
+		GenericServer: NewGenericServer(func(ctx context.Context) (func(), error) {
+			n, addr, err := conn.ReadFrom(buf[:])
+			if err != nil {
+				return nil, err
+			}
+			data := make([]byte, n, n)
+			copy(data, buf[:n])
+
+			return func() {
+				// Multiple goroutines may invoke methods on a PacketConn simultaneously.
+				handleConn(ctx, conn, addr, data)
+			}, nil
+		}, conn.Close),
+		conn: conn,
+	}
+}
+
+func (s *PacketServer) ListenAddr() net.Addr {
+	return s.conn.LocalAddr()
 }
 
 type (
@@ -59,8 +140,9 @@ func makeServeOptions(opts ...WithServeOption) ServeOptions {
 	return serveOpts
 }
 
-type Server struct {
-	listener net.Listener
+type GenericServer struct {
+	poll  func(context.Context) (func(), error)
+	close func() error
 
 	started *atomic.Bool
 	stopped *atomic.Bool
@@ -68,24 +150,28 @@ type Server struct {
 	donec   chan struct{}
 }
 
-func NewServer(l net.Listener) *Server {
-	return &Server{
-		listener: l,
-		started:  atomic.NewBool(false),
-		stopped:  atomic.NewBool(false),
-		stopc:    make(chan struct{}),
-		donec:    make(chan struct{}),
+func NewGenericServer(poller func(context.Context) (func(), error), closer func() error) *GenericServer {
+	return &GenericServer{
+		poll:    poller,
+		close:   closer,
+		started: atomic.NewBool(false),
+		stopped: atomic.NewBool(false),
+		stopc:   make(chan struct{}),
+		donec:   make(chan struct{}),
 	}
 }
 
-func (s *Server) Serve(handler ConnHandler, opts ...WithServeOption) error {
+func (s *GenericServer) Serve(opts ...WithServeOption) error {
+	// FIXME(damnever):
+	// - https://github.com/golang/go/issues/5045
+	// - https://golang.org/src/sync/once.go?s=1473:1500#L30
 	if s.started.Swap(true) {
 		return ErrAlreadyStarted
 	}
 	serveOpts := makeServeOptions(opts...)
 
 	ctx, cancel := context.WithCancel(serveOpts.context)
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	defer func() {
 		cancel() // Cancel sub-contexts.
 
@@ -110,7 +196,7 @@ func (s *Server) Serve(handler ConnHandler, opts ...WithServeOption) error {
 			return ctx.Err()
 		default:
 		}
-		conn, err := s.listener.Accept()
+		handle, err := s.poll(ctx)
 		if err != nil {
 			return err
 		}
@@ -118,16 +204,17 @@ func (s *Server) Serve(handler ConnHandler, opts ...WithServeOption) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			handler.HandleConn(ctx, conn)
+			// Panic handling is up to the caller.
+			handle()
 		}()
 	}
 }
 
-func (s *Server) Close() (err error) {
+func (s *GenericServer) Close() (err error) {
 	if s.stopped.Swap(true) {
 		err = ErrAlreadyStopped
 	} else {
-		err = s.listener.Close()
+		err = s.close()
 		close(s.stopc)
 	}
 	<-s.donec
