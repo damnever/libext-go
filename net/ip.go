@@ -1,16 +1,30 @@
 package net
 
 import (
+	"errors"
 	"net"
 )
 
-func ResolveHostIP() (string, error) {
+var (
+	ErrNoAvailableIPAddress     = errors.New("libext-go/net: no available IP address")
+	ErrNetworkInterfaceNotFound = errors.New("libext-go/net: network interface not found or not up")
+)
+
+// ResolveHostIP returns the non-loopback IP of a given network
+// interface, the empty interfaceName means all network interfaces,
+// only up interfaces will be checked.
+func ResolveHostIP(interfaceName string) (net.IP, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
+	interfaceFound := false
 	for _, iface := range ifaces {
+		if interfaceName != "" && iface.Name != interfaceName {
+			continue
+		}
+		interfaceFound = true
 		if iface.Flags&net.FlagUp == 0 {
 			continue // interface down
 		}
@@ -19,7 +33,7 @@ func ResolveHostIP() (string, error) {
 		}
 		addrs, err := iface.Addrs()
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		for _, addr := range addrs {
 			var ip net.IP
@@ -29,13 +43,15 @@ func ResolveHostIP() (string, error) {
 			case *net.IPAddr:
 				ip = v.IP
 			}
-			ip = ip.To4()
-			if ip == nil || ip.IsLoopback() {
+			if ip.IsLoopback() || (ip.To4() == nil && ip.To16() == nil) {
 				continue
 			}
-			return ip.String(), nil
+			return ip, nil
 		}
 	}
 
-	return "127.0.0.1", nil // XXX: return error?
+	if !interfaceFound {
+		return nil, ErrNetworkInterfaceNotFound
+	}
+	return nil, ErrNoAvailableIPAddress
 }
