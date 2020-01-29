@@ -14,6 +14,14 @@ type (
 		io.Writer
 		io.Reader
 	}
+	WithReadCloser struct {
+		io.Reader
+		io.Closer
+	}
+	WithWriteCloser struct {
+		io.Writer
+		io.Closer
+	}
 	WithCloser struct {
 		io.ReadWriter
 		io.Closer
