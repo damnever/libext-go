@@ -38,8 +38,10 @@ func NewTimedConnReader(conn net.Conn, timeout time.Duration) io.Reader {
 }
 
 func (r timedConnReader) Read(p []byte) (int, error) {
-	if err := r.conn.SetReadDeadline(time.Now().Add(r.timeout)); err != nil {
-		return 0, err
+	if r.timeout > 0 {
+		if err := r.conn.SetReadDeadline(time.Now().Add(r.timeout)); err != nil {
+			return 0, err
+		}
 	}
 	return r.conn.Read(p)
 }
@@ -57,8 +59,10 @@ func NewTimedConnWriter(conn net.Conn, timeout time.Duration) io.Writer {
 }
 
 func (w timedConnWriter) Write(b []byte) (int, error) {
-	if err := w.conn.SetWriteDeadline(time.Now().Add(w.timeout)); err != nil {
-		return 0, err
+	if w.timeout > 0 {
+		if err := w.conn.SetWriteDeadline(time.Now().Add(w.timeout)); err != nil {
+			return 0, err
+		}
 	}
 	return w.conn.Write(b)
 }
