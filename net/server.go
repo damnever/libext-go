@@ -65,6 +65,7 @@ func (s *Server) ListenAddr() net.Addr {
 type (
 	PacketHandleFunc func(context.Context, net.PacketConn, net.Addr, []byte)
 
+	// PacketServer processing one packet per goroutine, use with caution.
 	PacketServer struct {
 		*GenericServer
 
