@@ -3,6 +3,7 @@ package net
 import (
 	"context"
 	"errors"
+	"math"
 	"net"
 	"sync"
 	"time"
@@ -82,7 +83,9 @@ func NewUDPServer(laddr string, handleConn PacketHandleFunc) (*PacketServer, err
 }
 
 func NewPacketServerFromConn(conn net.PacketConn, handleConn PacketHandleFunc) *PacketServer {
-	var buf [2048]byte
+	// Here we can't do PMTUD and assume Ethernet frames are large,
+	// so take the IP packet maximum size as the buffer size.
+	buf := make([]byte, math.MaxUint16, math.MaxUint16)
 	return &PacketServer{
 		GenericServer: NewGenericServer(func(ctx context.Context) (func(), error) {
 			n, addr, err := conn.ReadFrom(buf[:])
