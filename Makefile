@@ -29,5 +29,3 @@ clean:  ## Clean up useless files.
 	find . -type f -name '.DS_Store' -exec rm -f {} +
 	find . -type f -name '*.test' -exec rm -f {} +
 	find . -type f -name '*.prof' -exec rm -f {} +
-	find . -type s -name 'localhost:*' -exec rm -f {} +
-	find . -type s -name '127.0.0.1:*' -exec rm -f {} +
