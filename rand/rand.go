@@ -1,7 +1,6 @@
 package rand
 
 import (
-	crand "crypto/rand"
 	"math/rand"
 	"time"
 )
@@ -17,12 +16,19 @@ func Shuffle(n int, swap func(i, j int)) {
 	if n == 0 {
 		return
 	}
-	r := rand.New(rand.NewSource(time.Now().UnixNano())) // seed + rand.Int63n(1000000)?
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	r.Shuffle(n, swap)
 }
 
 func Bytes(p []byte) {
-	_, _ = crand.Read(p)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i, n := 0, len(p); i < n; {
+		nr, err := r.Read(p[i:])
+		if err != nil {
+			panic(err)
+		}
+		i += nr
+	}
 }
 
 func String(n int) string {
