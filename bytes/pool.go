@@ -46,7 +46,7 @@ func (p *Pool) Get(size int) []byte {
 
 func (p *Pool) Put(b []byte) {
 	if idx := p.index(cap(b)); idx >= 0 && idx <= p.max2exp {
-		p.pools[idx].Put(b)
+		p.pools[idx].Put(b) //nolint:staticcheck
 	}
 }
 

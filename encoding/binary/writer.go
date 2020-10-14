@@ -28,6 +28,10 @@ func NewWriter(byteOrder binary.ByteOrder, w io.Writer) *Writer {
 	}
 }
 
+func (w *Writer) Reset(wr io.Writer) {
+	w.wr = wr
+}
+
 func (w *Writer) Write(p []byte) (int, error) {
 	return w.wr.Write(p)
 }

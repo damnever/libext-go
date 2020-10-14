@@ -21,6 +21,7 @@ func NewRewindableReader(r io.Reader) *RewindableReader {
 		rewind:  false,
 	}
 }
+
 func (rr *RewindableReader) Reset(r io.Reader) {
 	rr.rewind = false
 	rr.buf.Reset()

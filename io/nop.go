@@ -4,11 +4,11 @@ import "io"
 
 var (
 	// NopReader does nothing when performing Read operation (XXX: make it panic?).
-	NopReader = nopReader{}
+	NopReader = nopReader{} //nolint:gochecknoglobals
 	// NopWriter does nothing when performing Write operation (XXX: make it panic?).
-	NopWriter = nopWriter{}
+	NopWriter = nopWriter{} //nolint:gochecknoglobals
 	// NopCloser does nothing when performing Close operation (XXX: make it panic?).
-	NopCloser = nopCloser{}
+	NopCloser = nopCloser{} //nolint:gochecknoglobals
 
 	_ io.Reader = NopReader
 	_ io.Writer = NopWriter

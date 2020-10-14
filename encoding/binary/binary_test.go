@@ -66,7 +66,10 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // int16
-		for _, n := range []int16{math.MinInt16, math.MinInt8, -32, -64, 0, 1, 3, 32, 65, math.MaxInt8, math.MaxUint8, math.MaxInt16} {
+		for _, n := range []int16{
+			math.MinInt16, math.MinInt8, -32, -64, 0, 1, 3, 32, 65,
+			math.MaxInt8, math.MaxUint8, math.MaxInt16,
+		} {
 			require.Nil(t, w.WriteInt16(n))
 			var actual int16
 			require.Nil(t, r.ReadInt16(&actual))
@@ -74,8 +77,10 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // uint16
-		for _, n := range []uint16{0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
-			math.MaxInt16, math.MaxUint16} {
+		for _, n := range []uint16{
+			0, 1, 3, 8, 32, 65, math.MaxInt8,
+			math.MaxUint8, math.MaxInt16, math.MaxUint16,
+		} {
 			require.Nil(t, w.WriteUint16(n))
 			var actual uint16
 			require.Nil(t, r.ReadUint16(&actual))
@@ -83,8 +88,10 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // int32
-		for _, n := range []int32{math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
-			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32} {
+		for _, n := range []int32{
+			math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
+			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32,
+		} {
 			require.Nil(t, w.WriteInt32(n))
 			var actual int32
 			require.Nil(t, r.ReadInt32(&actual))
@@ -92,8 +99,10 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // uint32
-		for _, n := range []uint32{0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
-			math.MaxInt16, math.MaxUint16, math.MaxInt32, math.MaxUint32} {
+		for _, n := range []uint32{
+			0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
+			math.MaxInt16, math.MaxUint16, math.MaxInt32, math.MaxUint32,
+		} {
 			require.Nil(t, w.WriteUint32(n))
 			var actual uint32
 			require.Nil(t, r.ReadUint32(&actual))
@@ -101,9 +110,11 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // int64
-		for _, n := range []int64{math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
+		for _, n := range []int64{
+			math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
 			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32,
-			math.MaxUint32, math.MaxInt64} {
+			math.MaxUint32, math.MaxInt64,
+		} {
 			require.Nil(t, w.WriteInt64(n))
 			var actual int64
 			require.Nil(t, r.ReadInt64(&actual))
@@ -111,9 +122,11 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // uint64
-		for _, n := range []uint64{0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
+		for _, n := range []uint64{
+			0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
 			math.MaxInt16, math.MaxUint16, math.MaxInt32, math.MaxUint32,
-			math.MaxInt64, math.MaxUint64} {
+			math.MaxInt64, math.MaxUint64,
+		} {
 			require.Nil(t, w.WriteUint64(n))
 			var actual uint64
 			require.Nil(t, r.ReadUint64(&actual))
@@ -121,8 +134,10 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // float32
-		for _, n := range []float32{math.MinInt32, math.MinInt16, math.MinInt8, 0, 1.0 / 3.0, 1,
-			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32} {
+		for _, n := range []float32{
+			math.MinInt32, math.MinInt16, math.MinInt8, 0, 1.0 / 3.0, 1,
+			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32,
+		} {
 			require.Nil(t, w.WriteFloat32(n))
 			var actual float32
 			require.Nil(t, r.ReadFloat32(&actual))
@@ -130,9 +145,11 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // float64
-		for _, n := range []float64{math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1.0 / 3.0, 1,
+		for _, n := range []float64{
+			math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1.0 / 3.0, 1,
 			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32,
-			math.MaxUint32, math.MaxInt64} {
+			math.MaxUint32, math.MaxInt64,
+		} {
 			require.Nil(t, w.WriteFloat64(n))
 			var actual float64
 			require.Nil(t, r.ReadFloat64(&actual))
@@ -140,9 +157,11 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // varint
-		for _, n := range []int64{math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
+		for _, n := range []int64{
+			math.MinInt64, math.MinInt32, math.MinInt16, math.MinInt8, 0, 1,
 			math.MaxInt8, math.MaxUint8, math.MaxInt16, math.MaxUint16, math.MaxInt32,
-			math.MaxUint32, math.MaxInt64} {
+			math.MaxUint32, math.MaxInt64,
+		} {
 			require.Nil(t, w.WriteVarint(n))
 			var actual int64
 			require.Nil(t, r.ReadVarint(&actual))
@@ -150,9 +169,11 @@ func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
 		}
 	}
 	{ // uvarint
-		for _, n := range []uint64{0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
+		for _, n := range []uint64{
+			0, 1, 3, 8, 32, 65, math.MaxInt8, math.MaxUint8,
 			math.MaxInt16, math.MaxUint16, math.MaxInt32, math.MaxUint32,
-			math.MaxInt64, math.MaxUint64} {
+			math.MaxInt64, math.MaxUint64,
+		} {
 			require.Nil(t, w.WriteUvarint(n))
 			var actual uint64
 			require.Nil(t, r.ReadUvarint(&actual))

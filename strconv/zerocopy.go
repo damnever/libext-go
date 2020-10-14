@@ -9,10 +9,10 @@ func UnsafeAtob(s string) []byte {
 	if s == "" {
 		return []byte{}
 	}
-	return *(*[]byte)(unsafe.Pointer(&s))
+	return *(*[]byte)(unsafe.Pointer(&s)) //nolint:gosec
 }
 
 // UnsafeBtoa converts bytes into string without copy.
 func UnsafeBtoa(p []byte) string {
-	return *(*string)(unsafe.Pointer(&p))
+	return *(*string)(unsafe.Pointer(&p)) //nolint:gosec
 }

@@ -88,7 +88,7 @@ func NewPacketServerFromConn(conn net.PacketConn, handleConn PacketHandleFunc) *
 	buf := make([]byte, math.MaxUint16, math.MaxUint16)
 	return &PacketServer{
 		GenericServer: NewGenericServer(func(ctx context.Context) (func(), error) {
-			n, addr, err := conn.ReadFrom(buf[:])
+			n, addr, err := conn.ReadFrom(buf)
 			if err != nil {
 				return nil, err
 			}
@@ -128,16 +128,14 @@ func WithGracefulTimeout(gracefulTimeout time.Duration) WithServeOption {
 	}
 }
 
-var (
-	defaultServeOptions = []WithServeOption{
-		WithContext(context.Background()),
-		WithGracefulTimeout(defaultGracefulTimeout),
-	}
-)
+var _defaultServeOptions = []WithServeOption{
+	WithContext(context.Background()),
+	WithGracefulTimeout(defaultGracefulTimeout),
+}
 
 func makeServeOptions(opts ...WithServeOption) ServeOptions {
 	var serveOpts ServeOptions
-	opts = append(defaultServeOptions, opts...)
+	opts = append(_defaultServeOptions, opts...)
 	for _, opt := range opts {
 		opt(&serveOpts)
 	}

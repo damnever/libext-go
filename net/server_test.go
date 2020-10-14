@@ -55,6 +55,7 @@ func TestUDPServer(t *testing.T) {
 	uaddr, err := net.ResolveUDPAddr("udp", addr)
 	require.Nil(t, err)
 	conn, err := net.DialUDP("udp", nil, uaddr)
+	require.Nil(t, err)
 	buf := make([]byte, 1024)
 	for i := 1; i <= 23; i++ {
 		data := strconv.Itoa(i)
@@ -65,7 +66,6 @@ func TestUDPServer(t *testing.T) {
 		require.Equal(t, data, string(buf[:n]))
 	}
 	require.Nil(t, us.Close())
-
 }
 
 func randAddr(t *testing.T) string {

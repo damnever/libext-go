@@ -31,6 +31,10 @@ func NewReader(byteOrder binary.ByteOrder, r io.Reader) *Reader {
 	}
 }
 
+func (r *Reader) Reset(rd io.Reader) {
+	r.rd = rd
+}
+
 func (r *Reader) Read(p []byte) (int, error) {
 	return r.rd.Read(p)
 }
@@ -83,7 +87,7 @@ func (r *Reader) ReadUint8(v *uint8) error {
 	if _, err := r.rd.Read(buf); err != nil {
 		return err
 	}
-	*v = uint8(buf[0])
+	*v = buf[0]
 	return nil
 }
 
