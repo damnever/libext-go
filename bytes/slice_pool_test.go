@@ -58,6 +58,8 @@ type slicePoolTestData struct {
 }
 
 func testSlicePool(t *testing.T, p *SlicePool, dataset []slicePoolTestData) {
+	t.Helper()
+
 	for _, v := range dataset {
 		b := p.Get(v.size)
 		require.Equal(t, v.capacity, cap(b), fmt.Sprintf("%+v", v))
