@@ -13,7 +13,7 @@ test:  ## Run test cases. (Args: GOLANGCI_LINT_VERSION=latest)
 	_VERSION=$(GOLANGCI_LINT_VERSION); _VERSION=$${_VERSION#v}; \
 	if [[ ! -x $$(command -v golangci-lint) ]] || [[ "$${_VERSION}" != "latest" && $$(golangci-lint version 2>&1) != *"$${_VERSION}"* ]]; then \
 		if [[ ! -e ./bin/golangci-lint ]]; then \
-			curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s $(GOLANGCI_LINT_VERSION); \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s $(GOLANGCI_LINT_VERSION) || exit 1; \
 		fi; \
 		GOLANGCI_LINT_CMD=./bin/golangci-lint; \
 	fi; \

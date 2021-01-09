@@ -2,6 +2,7 @@ package net
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net"
 	"strconv"
@@ -17,7 +18,7 @@ func TestTCPServer(t *testing.T) {
 		for {
 			buf := make([]byte, 1024)
 			n, err := conn.Read(buf)
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			require.Nil(t, err)
@@ -69,6 +70,8 @@ func TestUDPServer(t *testing.T) {
 }
 
 func randAddr(t *testing.T) string {
+	t.Helper()
+
 	l, err := net.Listen("tcp", ":0")
 	require.Nil(t, err)
 	defer l.Close()

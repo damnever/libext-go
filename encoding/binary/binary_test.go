@@ -28,6 +28,8 @@ func TestLittleEndian(t *testing.T) {
 }
 
 func testReaderWriter(t *testing.T, r *Reader, w *Writer) {
+	t.Helper()
+
 	{ // byte
 		for _, b := range []byte("abcdefghijklmnopqrstuvwxyz") {
 			require.Nil(t, w.WriteByte(b))

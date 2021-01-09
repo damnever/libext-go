@@ -7,6 +7,8 @@ import (
 )
 
 func TestBufferPool(t *testing.T) {
+	t.Parallel()
+
 	p := NewBufferPool()
 	buf := p.Get()
 	p.Put(buf)

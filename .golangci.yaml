@@ -318,6 +318,8 @@ linters:
     - wsl
     - gomnd
     - nlreturn
+    - wrapcheck
+    - paralleltest
   disable-all: false
 
 
@@ -364,7 +366,7 @@ issues:
         - gochecknoglobals
         - deadcode
         - unused
-      text: "`_"
+      text: "_"
 
     - linters:
         - golint
