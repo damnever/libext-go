@@ -10,13 +10,14 @@ type ByteReadWriter struct {
 	ByteWriter
 }
 
+// ByteReader implements io.ByteReader.
 type ByteReader struct {
 	io.Reader
 
 	p [1]byte // We can use slice to avoid copy, but..
 }
 
-// NewByteReader creates new io.ByteReader.
+// NewByteReader creates new ByteReader.
 func NewByteReader(r io.Reader) *ByteReader {
 	return &ByteReader{Reader: r}
 }
@@ -30,11 +31,12 @@ func (r *ByteReader) ReadByte() (b byte, err error) {
 	return
 }
 
+// ByteWriter implements io.ByteWriter.
 type ByteWriter struct {
 	io.Writer
 }
 
-// NewByteWriter creates new io.ByteWriter.
+// NewByteWriter creates new ByteWriter.
 func NewByteWriter(w io.Writer) *ByteWriter {
 	return &ByteWriter{Writer: w}
 }
